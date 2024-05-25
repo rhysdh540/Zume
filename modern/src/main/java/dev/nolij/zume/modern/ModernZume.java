@@ -1,10 +1,9 @@
 package dev.nolij.zume.modern;
 
-import dev.nolij.zume.api.platform.v1.CameraPerspective;
-import dev.nolij.zume.api.platform.v1.IZumeImplementation;
-import dev.nolij.zume.api.platform.v1.ZumeAPI;
-import dev.nolij.zume.api.config.v1.ZumeConfigAPI;
 import dev.nolij.zume.api.util.v1.MethodHandleHelper;
+import dev.nolij.zume.impl.CameraPerspective;
+import dev.nolij.zume.impl.IZumeImplementation;
+import dev.nolij.zume.impl.Zume;
 import dev.nolij.zume.integration.implementation.embeddium.ZumeEmbeddiumConfigScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -24,10 +23,10 @@ public class ModernZume implements ClientModInitializer, IZumeImplementation {
 		if (FabricLoader.getInstance().getEnvironmentType() != EnvType.CLIENT)
 			return;
 		
-		ZumeAPI.getLogger().info("Loading Modern Zume...");
+		Zume.LOGGER.info("Loading Modern Zume...");
 		
-		ZumeAPI.registerImplementation(this, FabricLoader.getInstance().getConfigDir());
-		if (ZumeConfigAPI.isDisabled()) return;
+		Zume.init(this, FabricLoader.getInstance().getConfigDir());
+		if (Zume.config.disable) return;
 		
 		for (final ZumeKeyBind keyBind : ZumeKeyBind.values()) {
 			KeyBindingHelper.registerKeyBinding(keyBind.value);
