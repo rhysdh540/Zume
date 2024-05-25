@@ -12,13 +12,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MouseHandlerMixin {
 	
 	@Redirect(method = "turnPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;smoothCamera:Z"))
-	public boolean zume$updateMouse$smoothCameraEnabled(Options instance) {
+	public boolean zume$modifyCinematicCamera(Options instance) {
 		return ZumeAPI.cinematicCameraEnabledHook(instance.smoothCamera);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Redirect(method = "turnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;", ordinal = 0))
-	public <T> T zume$updateMouse$getMouseSensitivity$getValue(OptionInstance<Double> instance) {
+	public <T> T zume$updateMouseSensitivity(OptionInstance<Double> instance) {
 		return (T) (Object) ZumeAPI.mouseSensitivityHook(instance.get());
 	}
 	

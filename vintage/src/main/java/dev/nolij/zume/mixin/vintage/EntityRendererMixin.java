@@ -12,18 +12,18 @@ public abstract class EntityRendererMixin {
 	
 	@ModifyExpressionValue(method = {"updateCameraAndRender", "updateRenderer"}, 
 		at = @At(value = "FIELD", target = "Lnet/minecraft/client/settings/GameSettings;smoothCamera:Z"))
-	public boolean zume$updateMouse$smoothCameraEnabled(boolean original) {
+	public boolean zume$modifyCinematicCamera(boolean original) {
 		return ZumeAPI.cinematicCameraEnabledHook(original);
 	}
 	
 	@ModifyExpressionValue(method = {"updateCameraAndRender", "updateRenderer"},
 		at = @At(value = "FIELD", target = "Lnet/minecraft/client/settings/GameSettings;mouseSensitivity:F"))
-	public float zume$updateMouse$mouseSensitivity(float original) {
+	public float zume$updateMouseSensitivity(float original) {
 		return (float) ZumeAPI.mouseSensitivityHook(original);
 	}
 	
 	@ModifyVariable(method = "orientCamera", at = @At(value = "STORE", ordinal = 0), ordinal = 3)
-	public double zume$orientCamera$thirdPersonDistance(double original) {
+	public double zume$modifyThirdPersonDistance(double original) {
         return ZumeAPI.thirdPersonCameraHook(original);
 	}
 

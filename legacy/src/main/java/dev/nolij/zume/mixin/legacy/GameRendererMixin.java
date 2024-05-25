@@ -19,7 +19,7 @@ public class GameRendererMixin {
 		"method_1331", // archaic
 		"method_9775(FJ)V" // vintage
 	}, at = @At("HEAD"))
-	public void zume$render$HEAD(CallbackInfo ci) {
+	public void zume$render(CallbackInfo ci) {
 		ZumeAPI.renderHook();
 	}
 	
@@ -36,7 +36,7 @@ public class GameRendererMixin {
 		"method_1331", "tick", // archaic
 		"method_9775(FJ)V" // vintage
 	}, at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;smoothCameraEnabled:Z"))
-	public boolean zume$smoothCameraEnabled(boolean original) {
+	public boolean zume$modifyCinematicCamera(boolean original) {
 		return ZumeAPI.cinematicCameraEnabledHook(original);
 	}
 	
@@ -45,12 +45,12 @@ public class GameRendererMixin {
 		"method_1331", "tick", // archaic
 		"method_9775(FJ)V" // vintage
 	}, at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;sensitivity:F"))
-	public float zume$mouseSensitivity(float original) {
+	public float zume$updateMouseSensitivity(float original) {
 		return (float) ZumeAPI.mouseSensitivityHook(original);
 	}
 	
 	@ModifyVariable(method = "transformCamera", at = @At(value = "STORE", ordinal = 0), ordinal = 3)
-	public double zume$transformCamera$thirdPersonDistance(double original) {
+	public double zume$modifyThirdPersonDistance(double original) {
         return ZumeAPI.thirdPersonCameraHook(original);
 	}
 	

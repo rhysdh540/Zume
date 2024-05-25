@@ -18,7 +18,7 @@ public abstract class MouseHandlerMixin {
 		"turnPlayer", 
 		"method_1606(D)V" // 20.5+ compat
 	}, at = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;smoothCamera:Z"))
-	public boolean zume$updateMouse$smoothCameraEnabled(boolean original) {
+	public boolean zume$modifyCinematicCamera(boolean original) {
 		return ZumeAPI.cinematicCameraEnabledHook(original);
 	}
 	
@@ -29,27 +29,24 @@ public abstract class MouseHandlerMixin {
 		"turnPlayer", 
 		"method_1606(D)V" // 20.5+ compat
 	}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;", ordinal = 0), require = 0)
-	public <T> T zume$updateMouse$getMouseSensitivity$getValue(T original) {
+	public <T> T zume$updateMouseSensitivity(T original) {
 		return (T) (Object) ZumeAPI.mouseSensitivityHook((Double) original);
 	}
 	
 	@Dynamic
 	@Group(name = "zume$getMouseSensitivity", min = 1, max = 1)
 	@ModifyExpressionValue(method = "turnPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/class_315;field_1843:D", remap = false), require = 0)
-	public double zume$updateMouse$mouseSensitivity(double original) {
+	public double zume$updateMouseSensitivity(double original) {
 		return ZumeAPI.mouseSensitivityHook(original);
 	}
 	
 	@ModifyExpressionValue(method = "onScroll", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z"))
-	public boolean onMouseScroll$isSpectator(boolean original) {
-		if (ZumeAPI.isMouseScrollHookActive())
-			return false;
-		
-		return original;
+	public boolean zume$disableSpectatorScrollingIfZooming(boolean original) {
+		return !ZumeAPI.isMouseScrollHookActive() && original;
 	}
 	
 	@WrapWithCondition(method = "onScroll", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;swapPaint(D)V"))
-	public boolean onMouseScroll$scrollInHotbar(Inventory instance, double scrollAmount) {
+	public boolean zume$disableHotbarScrollingIfZooming(Inventory instance, double scrollAmount) {
 		return !ZumeAPI.mouseScrollHook((int) scrollAmount);
 	}
 	
