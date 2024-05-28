@@ -12,12 +12,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class GameRendererMixin {
 	
 	@Inject(method = "render", at = @At("HEAD"))
-	public void zume$render(CallbackInfo ci) {
+	public void render(CallbackInfo ci) {
 		ZumeAPI.renderHook();
 	}
 	
 	@ModifyReturnValue(method = "getFov", at = @At("TAIL"))
-	public double zume$modifyFOV(double original) {
+	public double modifyFOV(double original) {
 		return ZumeAPI.isFOVHookActive() ? ZumeAPI.fovHook(original) : original;
 	}
 	

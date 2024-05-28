@@ -13,22 +13,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class GameRendererMixin {
 	
 	@Inject(method = "method_1844", at = @At("HEAD"))
-	public void zume$render(CallbackInfo ci) {
+	public void render(CallbackInfo ci) {
 		ZumeAPI.renderHook();
 	}
 	
 	@ModifyReturnValue(method = "method_1848", at = @At("TAIL"))
-	public float zume$modifyFOV(float original) {
+	public float modifyFOV(float original) {
 		return ZumeAPI.isFOVHookActive() ? (float) ZumeAPI.fovHook(original) : original;
 	}
 	
 	@ModifyExpressionValue(method = "method_1844", at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;cinematicMode:Z"))
-	public boolean zume$modifyCinematicCamera(boolean original) {
+	public boolean modifyCinematicCamera(boolean original) {
 		return ZumeAPI.cinematicCameraEnabledHook(original);
 	}
 	
 	@ModifyExpressionValue(method = "method_1844", at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;mouseSensitivity:F"))
-	public float zume$updateMouseSensitivity(float original) {
+	public float updateMouseSensitivity(float original) {
 		return (float) ZumeAPI.mouseSensitivityHook(original);
 	}
 	
@@ -36,7 +36,7 @@ public abstract class GameRendererMixin {
 		@At(value = "FIELD", target = "Lnet/minecraft/class_555;field_2359:F"),
 		@At(value = "FIELD", target = "Lnet/minecraft/class_555;field_2360:F")
 	})
-	public float zume$modifyThirdPersonDistance(float original) {
+	public float modifyThirdPersonDistance(float original) {
         return (float) ZumeAPI.thirdPersonCameraHook(original);
 	}
 	

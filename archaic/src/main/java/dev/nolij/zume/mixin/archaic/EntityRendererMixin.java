@@ -13,24 +13,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class EntityRendererMixin {
 
 	@Inject(method = "updateCameraAndRender", at = @At("HEAD"))
-	public void zume$render(CallbackInfo ci) {
+	public void render(CallbackInfo ci) {
 		ZumeAPI.renderHook();
 	}
 	
 	@ModifyReturnValue(method = "getFOVModifier", at = @At("TAIL"))
-	public float zume$modifyFOV(float original) {
+	public float modifyFOV(float original) {
 		return ZumeAPI.isFOVHookActive() ? (float) ZumeAPI.fovHook(original) : original;
 	}
 
 	@ModifyExpressionValue(method = {"updateCameraAndRender", "updateRenderer"}, 
 		at = @At(value = "FIELD", target = "Lnet/minecraft/client/settings/GameSettings;smoothCamera:Z"))
-	public boolean zume$modifyCinematicCamera(boolean original) {
+	public boolean modifyCinematicCamera(boolean original) {
 		return ZumeAPI.cinematicCameraEnabledHook(original);
 	}
 
 	@ModifyExpressionValue(method = {"updateCameraAndRender", "updateRenderer"}, 
 		at = @At(value = "FIELD", target = "Lnet/minecraft/client/settings/GameSettings;mouseSensitivity:F"))
-	public float zume$updateMouseSensitivity(float original) {
+	public float updateMouseSensitivity(float original) {
 		return (float) ZumeAPI.mouseSensitivityHook(original);
 	}
 	
@@ -39,7 +39,7 @@ public abstract class EntityRendererMixin {
 			@At(value = "FIELD", target = "Lnet/minecraft/client/renderer/EntityRenderer;thirdPersonDistance:F"),
 			@At(value = "FIELD", target = "Lnet/minecraft/client/renderer/EntityRenderer;thirdPersonDistanceTemp:F")
 		})
-	public float zume$modifyThirdPersonDistance(float original) {
+	public float modifyThirdPersonDistance(float original) {
 		return (float) ZumeAPI.thirdPersonCameraHook(original);
 	}
 

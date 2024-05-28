@@ -16,7 +16,7 @@ public class MinecraftClientMixin {
 		"tick", // archaic 
 		"method_12141()V" // vintage
 	}, at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerInventory;scrollInHotbar(I)V"))
-	public boolean onMouseScroll$scrollInHotbar(PlayerInventory instance, int scrollAmount) {
+	public boolean disableHotbarScrollingIfZooming(PlayerInventory instance, int scrollAmount) {
 		return !ZumeAPI.mouseScrollHook(scrollAmount);
 	}
 	

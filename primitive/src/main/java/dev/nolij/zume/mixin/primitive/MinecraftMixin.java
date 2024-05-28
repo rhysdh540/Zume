@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class MinecraftMixin {
 	
 	@WrapWithCondition(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerInventory;method_692(I)V"))
-	public boolean zume$disableHotbarScrollingIfZooming(PlayerInventory instance, int scrollAmount) {
+	public boolean disableHotbarScrollingIfZooming(PlayerInventory instance, int scrollAmount) {
 		return !ZumeAPI.mouseScrollHook(scrollAmount);
 	}
 	

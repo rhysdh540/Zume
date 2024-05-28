@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public abstract class CameraMixin {
 	
 	@ModifyArg(method = "setup", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getMaxZoom(D)D"))
-	public double zume$modifyThirdPersonDistance(double original) {
+	public double modifyThirdPersonDistance(double original) {
         return ZumeAPI.thirdPersonCameraHook(original);
 	}
 	

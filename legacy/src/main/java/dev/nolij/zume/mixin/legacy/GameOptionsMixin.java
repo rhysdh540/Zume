@@ -14,12 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class GameOptionsMixin {
 	
 	@Unique
-	private static boolean zume$keybindsRegistered = false;
+	private static boolean keybindsRegistered = false;
 	
 	@Inject(method = "load", at = @At("HEAD"))
-	public void zume$registerKeybinds(CallbackInfo ci) {
-		if (ZumeConfigAPI.isDisabled() || zume$keybindsRegistered) return;
-		zume$keybindsRegistered = true;
+	public void registerKeybinds(CallbackInfo ci) {
+		if (ZumeConfigAPI.isDisabled() || keybindsRegistered) return;
+		keybindsRegistered = true;
 		
 		for (final ZumeKeyBind keyBind : ZumeKeyBind.values()) {
 			KeyBindingHelper.registerKeyBinding(keyBind.value);

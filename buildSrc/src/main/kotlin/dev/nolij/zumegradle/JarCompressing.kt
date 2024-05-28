@@ -148,12 +148,21 @@ private fun processClassFile(bytes: ByteArray, classFileSettings: ClassShrinking
 	}
 	
 	if(classNode.invisibleAnnotations?.map { it.desc }?.contains("Lorg/spongepowered/asm/mixin/Mixin;")	== true) {
-		classNode.methods.removeAll { it.name == "<init>" && it.instructions.size() <= 3 } // ALOAD, super(), RETURN
+		processMixinClass(classNode)
 	}
 
 	val writer = ClassWriter(0)
 	classNode.accept(writer)
 	return writer.toByteArray()
+}
+
+private fun processMixinClass(clazz: ClassNode) {
+	clazz.methods.removeAll { it.name == "<init>" && it.instructions.size() <= 3 } // ALOAD, super(), RETURN
+	
+	clazz.fields.forEach { it.name = "zume$${it.name}" }
+	clazz.methods.forEach { it.name = "zume$${it.name}" }
+	
+	//TODO: rename all usages of class members too - requires a full classpath scan (use asm or proguard)
 }
 
 val advzipInstalled = try {

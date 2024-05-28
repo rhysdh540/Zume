@@ -21,7 +21,7 @@ public class KeyBindingMixin {
 	@Shadow @Final private static Set<String> categories;
 	
 	@Inject(method = "<clinit>", at = @At("TAIL"))
-	private static void static$TAIL(CallbackInfo ci) {
+	private static void addKeybindingCategory(CallbackInfo ci) {
 		if (ZumeConfigAPI.isDisabled()) return;
 		
 		categories.add("zume");
