@@ -173,6 +173,7 @@ allprojects {
 		mavenCentral {
 			content {
 				excludeGroup("ca.weblite")
+				excludeGroup("org.lwjgl")
 			}
 		}
 		maven("https://repo.spongepowered.org/maven")
