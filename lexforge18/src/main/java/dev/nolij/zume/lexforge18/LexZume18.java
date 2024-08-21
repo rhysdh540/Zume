@@ -1,9 +1,11 @@
 package dev.nolij.zume.lexforge18;
 
+import org.lwjgl.glfw.GLFW;
 import dev.nolij.zume.api.util.v1.MethodHandleHelper;
 import dev.nolij.zume.impl.CameraPerspective;
 import dev.nolij.zume.impl.IZumeImplementation;
 import dev.nolij.zume.impl.Zume;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
@@ -22,6 +24,9 @@ import static dev.nolij.zume.impl.ZumeConstants.MOD_ID;
 
 @Mod(MOD_ID)
 public class LexZume18 implements IZumeImplementation {
+	private static final KeyMapping ZOOM = new KeyMapping("zume.zoom", GLFW.GLFW_KEY_Z, "zume");
+	private static final KeyMapping ZOOM_IN = new KeyMapping("zume.zoom_in", GLFW.GLFW_KEY_EQUAL, "zume");
+	private static final KeyMapping ZOOM_OUT = new KeyMapping("zume.zoom_out", GLFW.GLFW_KEY_MINUS, "zume");
 	
 	private static final Class<?> FOV_EVENT_CLASS = MethodHandleHelper.PUBLIC.getClassOrNull(
 		"net.minecraftforge.client.event.EntityViewRenderEvent$FieldOfView",
@@ -51,9 +56,9 @@ public class LexZume18 implements IZumeImplementation {
 		if (Zume.disabled)
 			return;
 		
-		for (final ZumeKeyBind keyBind : ZumeKeyBind.values()) {
-			ClientRegistry.registerKeyBinding(keyBind.value);
-		}
+		ClientRegistry.registerKeyBinding(ZOOM);
+		ClientRegistry.registerKeyBinding(ZOOM_IN);
+		ClientRegistry.registerKeyBinding(ZOOM_OUT);
 		
 		MinecraftForge.EVENT_BUS.addListener(this::render);
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::calculateFOV);
@@ -62,17 +67,17 @@ public class LexZume18 implements IZumeImplementation {
 	
 	@Override
 	public boolean isZoomPressed() {
-		return Minecraft.getInstance().screen == null && ZumeKeyBind.ZOOM.isPressed();
+		return Minecraft.getInstance().screen == null && ZOOM.isDown();
 	}
 	
 	@Override
 	public boolean isZoomInPressed() {
-		return ZumeKeyBind.ZOOM_IN.isPressed();
+		return ZOOM_IN.isDown();
 	}
 	
 	@Override
 	public boolean isZoomOutPressed() {
-		return ZumeKeyBind.ZOOM_OUT.isPressed();
+		return ZOOM_OUT.isDown();
 	}
 	
 	@Override

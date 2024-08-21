@@ -9,6 +9,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import org.lwjgl.input.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.SmoothUtil;
@@ -17,6 +18,10 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 
 public class LegacyZume implements ClientModInitializer, IZumeImplementation {
+	
+	public static final KeyBinding ZOOM = newKeyBinding("zume.zoom", Keyboard.KEY_Z, "zume");
+	public static final KeyBinding ZOOM_IN = newKeyBinding("zume.zoom_in", Keyboard.KEY_EQUALS, "zume");
+	public static final KeyBinding ZOOM_OUT = newKeyBinding("zume.zoom_out", Keyboard.KEY_MINUS, "zume");
 	
 	@Override
 	public void onInitializeClient() {
@@ -29,24 +34,24 @@ public class LegacyZume implements ClientModInitializer, IZumeImplementation {
 		if (Zume.disabled)
 			return;
 		
-		for (final ZumeKeyBind keyBind : ZumeKeyBind.values()) {
-			KeyBindingHelper.registerKeyBinding(keyBind.value);
-		}
+		KeyBindingHelper.registerKeyBinding(ZOOM);
+		KeyBindingHelper.registerKeyBinding(ZOOM_IN);
+		KeyBindingHelper.registerKeyBinding(ZOOM_OUT);
 	}
 	
 	@Override
 	public boolean isZoomPressed() {
-		return MinecraftClient.getInstance().currentScreen == null && ZumeKeyBind.ZOOM.isPressed();
+		return MinecraftClient.getInstance().currentScreen == null && ZOOM.isPressed();
 	}
 	
 	@Override
 	public boolean isZoomInPressed() {
-		return ZumeKeyBind.ZOOM_IN.isPressed();
+		return ZOOM_IN.isPressed();
 	}
 	
 	@Override
 	public boolean isZoomOutPressed() {
-		return ZumeKeyBind.ZOOM_OUT.isPressed();
+		return ZOOM_OUT.isPressed();
 	}
 	
 	@Override

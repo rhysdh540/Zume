@@ -13,10 +13,14 @@ import net.mine_diver.unsafeevents.listener.EventListener;
 import net.minecraft.client.Keybind;
 import net.minecraft.util.SmoothFloat;
 import net.modificationstation.stationapi.api.client.event.option.KeyBindingRegisterEvent;
+import org.lwjgl.input.Keyboard;
 
 import java.util.List;
 
 public class PrimitiveZume implements ClientModInitializer, IZumeImplementation {
+	private static final Keybind ZOOM = new Keybind("zume.zoom", Keyboard.KEY_Z);
+	private static final Keybind ZOOM_IN = new Keybind("zume.zoom_in", Keyboard.KEY_EQUALS);
+	private static final Keybind ZOOM_OUT = new Keybind("zume.zoom_out", Keyboard.KEY_MINUS);
 	
 	@Override
 	public void onInitializeClient() {
@@ -31,17 +35,17 @@ public class PrimitiveZume implements ClientModInitializer, IZumeImplementation 
 	@Override
 	public boolean isZoomPressed() {
 		//noinspection UnreachableCode,DataFlowIssue
-		return MinecraftAccessor.getInstance().screen == null && ZumeKeyBind.ZOOM.isPressed();
+		return MinecraftAccessor.getInstance().screen == null && Keyboard.isKeyDown(ZOOM.keyId);
 	}
 	
 	@Override
 	public boolean isZoomInPressed() {
-		return ZumeKeyBind.ZOOM_IN.isPressed();
+		return Keyboard.isKeyDown(ZOOM_IN.keyId);
 	}
 	
 	@Override
 	public boolean isZoomOutPressed() {
-		return ZumeKeyBind.ZOOM_OUT.isPressed();
+		return Keyboard.isKeyDown(ZOOM_OUT.keyId);
 	}
 	
 	@Override
@@ -67,9 +71,9 @@ public class PrimitiveZume implements ClientModInitializer, IZumeImplementation 
 	public static void registerKeyBindings(KeyBindingRegisterEvent event) {
 		final List<Keybind> binds = event.keyBindings;
 		
-		for (final ZumeKeyBind keyBind : ZumeKeyBind.values()) {
-			binds.add(keyBind.value);
-		}
+		binds.add(ZOOM);
+		binds.add(ZOOM_IN);
+		binds.add(ZOOM_OUT);
 	}
 	
 }

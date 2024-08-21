@@ -5,6 +5,7 @@ import dev.nolij.zume.impl.CameraPerspective;
 import dev.nolij.zume.impl.IZumeImplementation;
 import dev.nolij.zume.impl.Zume;
 import dev.nolij.zume.neoforge.integration.embeddium.ZumeEmbeddiumConfigScreen;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.neoforged.api.distmarker.Dist;
@@ -21,6 +22,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import org.lwjgl.glfw.GLFW;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -32,7 +34,11 @@ import static dev.nolij.zume.impl.ZumeConstants.MOD_ID;
 
 @Mod(value = MOD_ID, dist = Dist.CLIENT)
 public class NeoZume implements IZumeImplementation {
+	private static final KeyMapping ZOOM = new KeyMapping("zume.zoom", GLFW.GLFW_KEY_Z, "key.categories.movement");
+	private static final KeyMapping ZOOM_IN = new KeyMapping("zume.zoom_in", GLFW.GLFW_KEY_EQUAL, "key.categories.movement");
+	private static final KeyMapping ZOOM_OUT = new KeyMapping("zume.zoom_out", GLFW.GLFW_KEY_MINUS, "key.categories.movement");
 	
+	//region Reflection
 	private static final MethodHandleHelper METHOD_HANDLE_HELPER =
 		new MethodHandleHelper(NeoZume.class.getClassLoader(), MethodHandles.lookup());
 	
@@ -66,6 +72,7 @@ public class NeoZume implements IZumeImplementation {
 		RENDER_TICK_EVENT, "phase", TICK_EVENT_PHASE, MethodType.methodType(Enum.class, Object.class));
 	private static final Class<?> RENDER_FRAME_EVENT = METHOD_HANDLE_HELPER.getClassOrNull(
 		"net.neoforged.neoforge.client.event.RenderFrameEvent$Pre");
+	//endregion
 	
 	public NeoZume(IEventBus modEventBus, ModContainer modContainer) {
 		if (!FMLEnvironment.dist.isClient())
@@ -120,17 +127,17 @@ public class NeoZume implements IZumeImplementation {
 	
 	@Override
 	public boolean isZoomPressed() {
-		return ZumeKeyBind.ZOOM.isPressed();
+		return ZOOM.isDown();
 	}
 	
 	@Override
 	public boolean isZoomInPressed() {
-		return ZumeKeyBind.ZOOM_IN.isPressed();
+		return ZOOM_IN.isDown();
 	}
 	
 	@Override
 	public boolean isZoomOutPressed() {
-		return ZumeKeyBind.ZOOM_OUT.isPressed();
+		return ZOOM_OUT.isDown();
 	}
 	
 	@Override
@@ -139,9 +146,9 @@ public class NeoZume implements IZumeImplementation {
 	}
 	
 	private void registerKeyBindings(RegisterKeyMappingsEvent event) {
-		for (final ZumeKeyBind keyBind : ZumeKeyBind.values()) {
-			event.register(keyBind.value);
-		}
+		event.register(ZOOM);
+		event.register(ZOOM_IN);
+		event.register(ZOOM_OUT);
 	}
 	
 	private void render(Object event) {

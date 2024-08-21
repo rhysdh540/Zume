@@ -26,10 +26,8 @@ public class ZumeModMenuIntegration implements ModMenuApi {
 	
 	@Override
 	public Function<Screen, ? extends Screen> getConfigScreenFactory() {
-		return (parent) -> {
-            //noinspection DataFlowIssue
-            return new ModernZumeConfigScreen((Component) LITERALTEXT_INIT.invokeExact(""), parent);
-        };
+		// noinspection DataFlowIssue
+		return (parent) -> new ModernZumeConfigScreen((Component) LITERALTEXT_INIT.invokeExact(""), parent);
 	}
 	
 	@Override

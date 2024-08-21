@@ -1,10 +1,12 @@
 package dev.nolij.zume.vintage;
 
+import org.lwjgl.input.Keyboard;
 import dev.nolij.zume.api.util.v1.MethodHandleHelper;
 import dev.nolij.zume.impl.CameraPerspective;
 import dev.nolij.zume.impl.IZumeImplementation;
 import dev.nolij.zume.impl.Zume;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.MouseEvent;
@@ -30,6 +32,9 @@ import static dev.nolij.zume.impl.ZumeConstants.*;
 	acceptedMinecraftVersions = VINTAGE_VERSION_RANGE,
 	guiFactory = "dev.nolij.zume.vintage.VintageConfigProvider")
 public class VintageZume implements IZumeImplementation {
+	private static final KeyBinding ZOOM = new KeyBinding("zume.zoom", Keyboard.KEY_Z, "zume");
+	private static final KeyBinding ZOOM_IN = new KeyBinding("zume.zoom_in", Keyboard.KEY_EQUALS, "zume");
+	private static final KeyBinding ZOOM_OUT = new KeyBinding("zume.zoom_out", Keyboard.KEY_MINUS, "zume");
 	
 	public VintageZume() {
 		if (!FMLLaunchHandler.side().isClient())
@@ -41,26 +46,26 @@ public class VintageZume implements IZumeImplementation {
 		if (Zume.disabled)
 			return;
 		
-		for (final ZumeKeyBind keyBind : ZumeKeyBind.values()) {
-			ClientRegistry.registerKeyBinding(keyBind.value);
-		}
+		ClientRegistry.registerKeyBinding(ZOOM);
+		ClientRegistry.registerKeyBinding(ZOOM_IN);
+		ClientRegistry.registerKeyBinding(ZOOM_OUT);
 		
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	@Override
 	public boolean isZoomPressed() {
-		return Minecraft.getMinecraft().currentScreen == null && ZumeKeyBind.ZOOM.isPressed();
+		return Minecraft.getMinecraft().currentScreen == null && ZOOM.isKeyDown();
 	}
 	
 	@Override
 	public boolean isZoomInPressed() {
-		return ZumeKeyBind.ZOOM_IN.isPressed();
+		return ZOOM_IN.isPressed();
 	}
 	
 	@Override
 	public boolean isZoomOutPressed() {
-		return ZumeKeyBind.ZOOM_OUT.isPressed();
+		return ZOOM_OUT.isPressed();
 	}
 	
 	@Override
