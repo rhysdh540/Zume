@@ -175,11 +175,6 @@ allprojects {
 	apply(plugin = "maven-publish")
 
 	repositories {
-		mavenCentral {
-			content {
-				excludeGroup("ca.weblite")
-			}
-		}
 		maven("https://repo.spongepowered.org/maven")
 		maven("https://jitpack.io/")
 		exclusiveContent { 
