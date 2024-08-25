@@ -5,10 +5,10 @@
 	"compatibilityLevel": "JAVA_8",
 	"client": [
 		"archaic.EntityRendererAccessor",
-		"archaic.EntityRendererMixin"
+		"archaic.EntityRendererMixin",
+		"archaic.DummyMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
-	},
-	"refmap": "zume-archaic-refmap.json"
+	}
 }

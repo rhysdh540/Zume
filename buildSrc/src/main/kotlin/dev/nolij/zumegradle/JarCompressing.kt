@@ -121,6 +121,21 @@ private fun processClassFile(bytes: ByteArray, mappings: MemoryMappingTree): Byt
 		}
 	}
 	
+	@Suppress("UNCHECKED_CAST")
+	for(annotation in classNode.invisibleAnnotations ?: emptyList()) {
+		if (annotation.desc == "Lorg/spongepowered/asm/mixin/Mixin;") {
+			println("Found mixin class: ${classNode.name}")
+			for (i in 0 until annotation.values.size step 2) {
+				if (annotation.values[i] == "targets") {
+					val targets = annotation.values[i + 1] as List<String>
+					println("Found mixin targets: $targets")
+					val newTargets = targets.map { mappings.obfuscate(it) }
+					annotation.values[i + 1] = newTargets
+				}
+			}
+		}
+	}
+	
 	val strippableAnnotations = setOf(
 		"Lorg/spongepowered/asm/mixin/Dynamic;",
 		"Lorg/spongepowered/asm/mixin/Final;",
@@ -166,10 +181,12 @@ private fun processClassFile(bytes: ByteArray, mappings: MemoryMappingTree): Byt
 	return writer.toByteArray()
 }
 
-val advzipInstalled = try {
-	ProcessBuilder("advzip", "-V").start().waitFor() == 0
-} catch (e: Exception) {
-	false
+val advzipInstalled by lazy {
+	try {
+		ProcessBuilder("advzip", "-V").start().waitFor() == 0
+	} catch (e: Exception) {
+		false
+	}
 }
 
 fun deflate(zip: File, type: DeflateAlgorithm) {

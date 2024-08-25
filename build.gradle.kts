@@ -194,7 +194,8 @@ allprojects {
 			javaCompiler = javaToolchains.compilerFor {
 				languageVersion = JavaLanguageVersion.of(21)
 			}
-			options.compilerArgs.addAll(arrayOf("-Xplugin:Manifold no-bootstrap", "-Xplugin:jabel"))
+			options.compilerArgs.addAll(arrayOf("-Xplugin:Manifold no-bootstrap", "-Xplugin:jabel", "-Xlint:-options"))
+			options.forkOptions.jvmArgs?.add("-XX:+EnableDynamicAgentLoading")
 		}
 	}
 	

@@ -19,7 +19,6 @@ public class VintageZumeConfigGUI extends GuiConfig {
 	
 	@Override
 	public void initGui() {
-		this.onGuiClosed();
 		Minecraft.getMinecraft().displayGuiScreen(parentScreen);
 	}
 	

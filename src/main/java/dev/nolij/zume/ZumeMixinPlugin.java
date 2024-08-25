@@ -1,11 +1,11 @@
 package dev.nolij.zume;
 
 import dev.nolij.zume.api.util.v1.MethodHandleHelper;
+import dev.nolij.zume.impl.Zume;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import java.lang.invoke.MethodType;
 import java.util.List;
 import java.util.Set;
 
@@ -94,7 +94,12 @@ public final class ZumeMixinPlugin implements IMixinConfigPlugin {
 	}
 	
 	@Override
-	public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
+	public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+		if(targetClassName.equals("dev.nolij.zume.vintage.VintageZumeConfigGUI")) {
+			Zume.LOGGER.info("Found target class: {}", targetClassName);
+			targetClass.superName = "cpw/mods/fml/client/config/GuiConfig";
+		}
+	}
 	
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
