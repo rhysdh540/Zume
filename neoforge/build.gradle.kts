@@ -1,3 +1,5 @@
+import xyz.wagyourtail.unimined.util.OSUtils
+
 operator fun String.invoke(): String = rootProject.properties[this] as? String ?: error("Property $this not found")
 
 val modCompileOnly: Configuration by configurations.creating {
@@ -24,13 +26,21 @@ unimined.minecraft {
 
 	mappings {
 		mojmap()
-//		parchment(mcVersion = "neoforge_minecraft_version"(), version = "neoforge_parchment_version"())
+		parchment(mcVersion = "neoforge_parchment_mc_version"(), version = "neoforge_parchment_version"())
 	}
 
 	mods {
 		remap(modCompileOnly)
 		remap(modRuntimeOnly)
 		remap(mod)
+	}
+	
+	runs {
+		config("client") {
+			if(OSUtils.oSId == OSUtils.OSX) {
+				jvmArgs("-XstartOnFirstThread")
+			}
+		}
 	}
 }
 
