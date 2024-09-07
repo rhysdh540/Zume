@@ -195,6 +195,7 @@ allprojects {
 				languageVersion = JavaLanguageVersion.of(21)
 			}
 			options.compilerArgs.addAll(arrayOf("-Xplugin:Manifold no-bootstrap", "-Xplugin:jabel"))
+			options.forkOptions.jvmArgs?.addAll(arrayOf("-XX:+EnableDynamicAgentLoading"))
 		}
 	}
 	
@@ -299,11 +300,13 @@ subprojects {
 		val minecraftLibraries by configurations.getting
 		
 		dependencies {
+			compileOnly("dev.nolij:zson:${"zson_version"()}")
 			minecraftLibraries("dev.nolij:zson:${"zson_version"()}:downgraded-8")
 		}
 	} else {
 		dependencies {
-			implementation("dev.nolij:zson:${"zson_version"()}:downgraded-8")
+			compileOnly("dev.nolij:zson:${"zson_version"()}")
+			runtimeOnly("dev.nolij:zson:${"zson_version"()}:downgraded-8")
 		}
 	}
 }
