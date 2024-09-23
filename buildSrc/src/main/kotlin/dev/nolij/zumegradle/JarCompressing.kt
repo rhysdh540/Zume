@@ -73,12 +73,10 @@ fun squishJar(jar: File, jsonProcessing: JsonShrinkingType, mappingsFile: File?)
 				name.endsWith(".json") || name.endsWith(".mcmeta") || name == "mcmod.info"
 			) {
 				bytes = when (jsonProcessing) {
-					JsonShrinkingType.MINIFY -> JsonOutput.toJson(json.parse(bytes)).toByteArray()
+					JsonShrinkingType.MINIFY -> JsonOutput.toJson(json.parse(bytes))
 					JsonShrinkingType.PRETTY_PRINT -> JsonOutput.prettyPrint(JsonOutput.toJson(json.parse(bytes)))
-						.toByteArray()
-
 					else -> throw AssertionError()
-				}
+				}.toByteArray()
 			}
 
 			if (name.endsWith(".class")) {

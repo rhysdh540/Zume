@@ -30,16 +30,16 @@ public class ZumeBootstrapper {
 		if (ZumeMixinPlugin.ZUME_VARIANT != null)
 			return;
 		
-		String FABRIC_MISSING_DEPENDENCY_MESSAGE = """
+		String message = """
 		Failed to detect which variant of Zume to load! Ensure all dependencies are installed:
 		    Fabric (14.4+): Fabric API (fabric-key-binding-api-v1)
 		    Legacy Fabric (6.4-12.2): Legacy Fabric API (legacy-fabric-keybinding-api-v1-common)
 		    Babric (b7.3): Station API (station-keybindings-v0)""";
 		
-		Zume.LOGGER.error(FABRIC_MISSING_DEPENDENCY_MESSAGE);
+		Zume.LOGGER.error(message);
 		FabricGuiEntry.displayError("Incompatible mods found!", null, tree -> {
 			var tab = tree.addTab("Error");
-			tab.node.addMessage(FABRIC_MISSING_DEPENDENCY_MESSAGE, FabricStatusTree.FabricTreeWarningLevel.ERROR);
+			tab.node.addMessage(message, FabricStatusTree.FabricTreeWarningLevel.ERROR);
 			var itr = tree.tabs.iterator();
 			while (itr.hasNext()) {
 				if (itr.next() != tab)
@@ -55,15 +55,6 @@ public class ZumeBootstrapper {
 	}
 	
 	public ZumeBootstrapper() {
-		if (ZumeMixinPlugin.ZUME_VARIANT == null) {
-			throw new AssertionError("""
-                Mixins did not load! Zume requires Mixins in order to work properly.
-                Please install one of the following mixin loaders:
-                14.4 - 16.0: MixinBootstrap
-                8.9 - 12.2: MixinBooter >= 5.0
-                7.10 - 12.2: UniMixins >= 0.1.15""");
-		}
-		
 		switch (ZumeMixinPlugin.ZUME_VARIANT) {
 			case ZumeMixinPlugin.MODERN -> new ModernZume().onInitializeClient();
 			case ZumeMixinPlugin.LEGACY -> new LegacyZume().onInitializeClient();
@@ -72,6 +63,12 @@ public class ZumeBootstrapper {
 			case ZumeMixinPlugin.LEXFORGE18 -> new LexZume18();
 			case ZumeMixinPlugin.LEXFORGE16 -> new LexZume16();
 			case ZumeMixinPlugin.VINTAGE_FORGE -> new VintageZume();
+			default -> throw new AssertionError("""
+                Mixins did not load! Zume requires Mixins in order to work properly.
+                Please install one of the following mixin loaders:
+                    14.4 - 16.0: MixinBootstrap
+                    8.9 - 12.2: MixinBooter >= 5.0
+                    7.10 - 12.2: UniMixins >= 0.1.15""");
 		}
 	}
 	
