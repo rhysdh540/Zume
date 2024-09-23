@@ -4,6 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.impl.gui.FabricGuiEntry;
 import net.fabricmc.loader.impl.gui.FabricStatusTree;
 import dev.nolij.zume.impl.Zume;
+import dev.nolij.zumegradle.proguard.ProGuardKeep;
 import net.minecraftforge.fml.common.Mod;
 
 import static dev.nolij.zume.impl.ZumeConstants.*;
@@ -17,6 +18,7 @@ import static dev.nolij.zume.impl.ZumeConstants.*;
 	guiFactory = "dev.nolij.zume.vintage.VintageConfigProvider")
 public class ZumeBootstrapper {
 	
+	@ProGuardKeep
 	@SuppressWarnings("Java8CollectionRemoveIf") // extra lambda = extra method = extra size
 	public static void fabricPreLaunch() {
 		if (ZumeMixinPlugin.ZUME_VARIANT != null)
@@ -40,36 +42,39 @@ public class ZumeBootstrapper {
 		}, true);
 	}
 	
+	@ProGuardKeep
+	@SuppressWarnings("InstantiationOfUtilityClass") // it's not a utility class
 	public static void fabricInit() {
-		if (ZumeMixinPlugin.ZUME_VARIANT == null)
-			return;
+		new ZumeBootstrapper();
+	}
+	
+	public ZumeBootstrapper() {
+		if (ZumeMixinPlugin.ZUME_VARIANT == null) {
+			throw new AssertionError("""
+                Mixins did not load! Zume requires Mixins in order to work properly.
+                Please install one of the following mixin loaders:
+                14.4 - 16.0: MixinBootstrap
+                8.9 - 12.2: MixinBooter >= 5.0
+                7.10 - 12.2: UniMixins >= 0.1.15""");
+		}
 		
 		final String className = switch (ZumeMixinPlugin.ZUME_VARIANT) {
 			case ZumeMixinPlugin.MODERN -> "dev.nolij.zume.modern.ModernZume";
 			case ZumeMixinPlugin.LEGACY -> "dev.nolij.zume.legacy.LegacyZume";
 			case ZumeMixinPlugin.PRIMITIVE -> "dev.nolij.zume.primitive.PrimitiveZume";
-			default -> null;
-		};
-		((ClientModInitializer) Class.forName(className).getConstructor().newInstance()).onInitializeClient();
-	}
-	
-	public ZumeBootstrapper() {
-		if (ZumeMixinPlugin.ZUME_VARIANT == null)
-			throw new AssertionError("""
-				Mixins did not load! Zume requires Mixins in order to work properly.
-				Please install one of the following mixin loaders:
-				14.4 - 16.0: MixinBootstrap
-				8.9 - 12.2: MixinBooter >= 5.0
-				7.10 - 12.2: UniMixins >= 0.1.15""");
-		
-		final String className = switch (ZumeMixinPlugin.ZUME_VARIANT) {
 			case ZumeMixinPlugin.LEXFORGE -> "dev.nolij.zume.lexforge.LexZume";
 			case ZumeMixinPlugin.LEXFORGE18 -> "dev.nolij.zume.lexforge18.LexZume18";
 			case ZumeMixinPlugin.LEXFORGE16 -> "dev.nolij.zume.lexforge16.LexZume16";
 			case ZumeMixinPlugin.VINTAGE_FORGE -> "dev.nolij.zume.vintage.VintageZume";
 			default -> null;
 		};
-		Class.forName(className).getConstructor().newInstance();
+		
+		if (className != null) {
+			Object instance = Class.forName(className).getConstructor().newInstance();
+			if (instance instanceof ClientModInitializer) {
+				((ClientModInitializer) instance).onInitializeClient();
+			}
+		}
 	}
 	
 }
