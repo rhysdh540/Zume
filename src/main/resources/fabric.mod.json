@@ -17,10 +17,10 @@
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-			"dev.nolij.zume.FabricZumeBootstrapper"
+			"dev.nolij.zume.ZumeBootstrapper::fabricInit"
 		],
 		"preLaunch": [
-			"dev.nolij.zume.FabricZumeBootstrapper"
+			"dev.nolij.zume.ZumeBootstrapper::fabricPreLaunch"
 		],
 		"modmenu": [
 			"dev.nolij.zume.modern.integration.modmenu.ZumeModMenuIntegration"
