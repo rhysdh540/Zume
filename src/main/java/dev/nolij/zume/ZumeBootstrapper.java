@@ -69,11 +69,9 @@ public class ZumeBootstrapper {
 			default -> null;
 		};
 		
-		if (className != null) {
-			Object instance = Class.forName(className).getConstructor().newInstance();
-			if (instance instanceof ClientModInitializer) {
-				((ClientModInitializer) instance).onInitializeClient();
-			}
+		Object instance = Class.forName(className).getConstructor().newInstance();
+		if (instance instanceof ClientModInitializer c) {
+			c.onInitializeClient();
 		}
 	}
 	
