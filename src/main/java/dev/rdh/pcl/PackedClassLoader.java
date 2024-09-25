@@ -49,8 +49,10 @@ public class PackedClassLoader extends ClassLoader {
 	}
 
 	private byte[] getEntry(String name) {
+		System.out.println("Getting entry: " + name);
 		Long posAndLength = offsets.get(name);
 		if (posAndLength == null) {
+			System.out.println("Entry not found: " + name);
 			return null;
 		}
 
@@ -61,6 +63,7 @@ public class PackedClassLoader extends ClassLoader {
 			byte[] bytes = new byte[length];
 			is.skip(pos);
 			is.read(bytes);
+			System.out.println("Got entry: " + name);
 			return bytes;
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to load entry: " + name, e);

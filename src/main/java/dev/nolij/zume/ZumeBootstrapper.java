@@ -67,15 +67,16 @@ public class ZumeBootstrapper {
                     7.10 - 12.2: UniMixins >= 0.1.15""");
 		};
 		
-		PackedClassLoader classLoader = new PackedClassLoader(getClass().getClassLoader(), "zume.pack");
-		Thread.currentThread().setContextClassLoader(classLoader);
+		PackedClassLoader classLoader = new PackedClassLoader(ZumeBootstrapper.class.getClassLoader(), "zume.pack");
 		
 		try {
 			Object o = classLoader.loadClass(className).getDeclaredConstructor().newInstance();
-			if(o instanceof ClientModInitializer)
+			if (o instanceof ClientModInitializer)
 				((ClientModInitializer) o).onInitializeClient();
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("Failed to load Zume variant: " + className, e);
+		} catch (NoClassDefFoundError e) {
+			if (!e.getMessage().contains("net/fabricmc/api/ClientModInitializer")) {
+				throw e;
+			}
 		}
 	}
 	

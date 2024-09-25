@@ -281,6 +281,7 @@ fun pack(jar: File, mappingsFile: File?, output: String) {
 		"dev.rdh.pcl.ByteArrayURLStreamHandler$1",
 		"dev.nolij.zume.ZumeMixinPlugin",
 		"dev.nolij.zume.ZumeBootstrapper",
+		"dev.nolij.zume.impl.Zume"
 	).map { mappingsTree?.obfuscate(it) ?: it }
 	
 	println("Classes to not pack: $classesToNotPack")
