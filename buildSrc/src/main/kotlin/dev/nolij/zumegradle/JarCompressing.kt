@@ -1,5 +1,6 @@
 package dev.nolij.zumegradle
 
+import dev.rdh.pcl.Packer
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import net.fabricmc.mappingio.MappingReader
@@ -260,6 +261,82 @@ fun applyProguard(jar: File, minecraftConfigs: List<MinecraftConfig>, configDir:
 	}
 }
 
+fun pack(jar: File, mappingsFile: File?, output: String) {
+	val jarFile = JarFile(jar)
+	val contents = linkedMapOf<String, ByteArray>()
+	JarFile(jar).use {
+		it.entries().asIterator().forEach { entry ->
+			if (!entry.isDirectory) {
+				contents[entry.name] = it.getInputStream(entry).readAllBytes()
+			}
+		}
+	}
+	jarFile.close()
+
+	val mappingsTree = mappingsFile?.let { mappings(it) }
+
+	val classesToNotPack = setOf(
+		"dev.rdh.pcl.PackedClassLoader",
+		"dev.rdh.pcl.ByteArrayURLStreamHandler",
+		"dev.rdh.pcl.ByteArrayURLStreamHandler$1",
+		"dev.nolij.zume.ZumeMixinPlugin",
+		"dev.nolij.zume.ZumeBootstrapper",
+	).map { mappingsTree?.obfuscate(it) ?: it }
+	
+	println("Classes to not pack: $classesToNotPack")
+
+	val resourcesToNotPack = setOf(
+		"META-INF/MANIFEST.MF",
+		"fabric.mod.json",
+		"META-INF/mods.toml",
+		"META-INF/neoforge.mods.toml",
+		"mcmod.info",
+		"LICENSE_zume",
+		"pack.mcmeta",
+		"zume.mixins.json"
+	)
+
+	val toBundle = contents.filter { (name) ->
+		if (name.endsWith(".class")) {
+			!name.startsWith("dev/nolij/zume/api") 
+				&& !name.startsWith("zume/mixin")
+				&& !classesToNotPack.contains(name.removeSuffix(".class").replace("/", "."))
+		} else {
+			!resourcesToNotPack.contains(name)
+		}
+	}
+
+	println(toBundle.keys)
+	println()
+
+	JarOutputStream(jar.outputStream()).use { out ->
+		out.setLevel(Deflater.BEST_COMPRESSION)
+		contents.forEach { (name, bytes) ->
+			if (toBundle.containsKey(name)) {
+				println("packing $name")
+				return@forEach
+			}
+
+			print("skipping $name")
+			if (mappingsTree != null && name.endsWith(".class")) {
+				println(" -> ${mappingsTree.deobfuscate(name.removeSuffix(".class"))}")
+			} else {
+				println()
+			}
+
+			out.putNextEntry(JarEntry(name))
+			out.write(bytes)
+			out.closeEntry()
+		}
+
+		out.putNextEntry(JarEntry(output))
+		out.write(Packer.pack(toBundle))
+		out.closeEntry()
+
+		out.finish()
+	}
+}
+
 open class CompressJarTask : DefaultTask() {
 	@InputFile
 	lateinit var inputJar: File
@@ -307,6 +384,7 @@ open class CompressJarTask : DefaultTask() {
 		if (useProguard)
 			applyProguard(inputJar, minecraftConfigs, project.rootDir)
 		squishJar(inputJar, jsonShrinkingType, mappingsFile)
+		pack(inputJar, mappingsFile, "zume.pack")
 		deflate(outputJar, deflateAlgorithm)
 	}
 }
@@ -319,6 +397,22 @@ fun mappings(file: File, format: MappingFormat = MappingFormat.PROGUARD): Memory
 	val mappingTree = MemoryMappingTree()
 	MappingReader.read(file.toPath(), format, mappingTree)
 	return mappingTree
+}
+
+@Suppress("INACCESSIBLE_TYPE", "NAME_SHADOWING")
+fun MemoryMappingTree.deobfuscate(dst: String): String {
+	val dst = dst.replace('.', '/')
+	val dstNamespaceIndexes = dstNamespaces.map { getNamespaceId(it) }
+	
+	for(classMapping: ClassMapping in classes) {
+		for(dstNamespaceIndex in dstNamespaceIndexes) {
+			if(classMapping.getDstName(dstNamespaceIndex) == dst) {
+				return classMapping.srcName.replace('/', '.')
+			}
+		}
+	}
+	
+	throw IllegalArgumentException("Class $dst not found in mappings")
 }
 
 @Suppress("INACCESSIBLE_TYPE", "NAME_SHADOWING")

@@ -1,16 +1,11 @@
 package dev.nolij.zume;
 
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.loader.impl.gui.FabricGuiEntry;
 import net.fabricmc.loader.impl.gui.FabricStatusTree;
 import dev.nolij.zume.impl.Zume;
-import dev.nolij.zume.legacy.LegacyZume;
-import dev.nolij.zume.lexforge.LexZume;
-import dev.nolij.zume.lexforge16.LexZume16;
-import dev.nolij.zume.lexforge18.LexZume18;
-import dev.nolij.zume.modern.ModernZume;
-import dev.nolij.zume.primitive.PrimitiveZume;
-import dev.nolij.zume.vintage.VintageZume;
 import dev.nolij.zumegradle.proguard.ProGuardKeep;
+import dev.rdh.pcl.PackedClassLoader;
 import net.minecraftforge.fml.common.Mod;
 
 import static dev.nolij.zume.impl.ZumeConstants.*;
@@ -55,20 +50,32 @@ public class ZumeBootstrapper {
 	}
 	
 	public ZumeBootstrapper() {
+		String className =
 		switch (ZumeMixinPlugin.ZUME_VARIANT) {
-			case ZumeMixinPlugin.MODERN -> new ModernZume().onInitializeClient();
-			case ZumeMixinPlugin.LEGACY -> new LegacyZume().onInitializeClient();
-			case ZumeMixinPlugin.PRIMITIVE -> new PrimitiveZume().onInitializeClient();
-			case ZumeMixinPlugin.LEXFORGE -> new LexZume();
-			case ZumeMixinPlugin.LEXFORGE18 -> new LexZume18();
-			case ZumeMixinPlugin.LEXFORGE16 -> new LexZume16();
-			case ZumeMixinPlugin.VINTAGE_FORGE -> new VintageZume();
+			case ZumeMixinPlugin.MODERN -> "dev.nolij.zume.modern.ModernZume";
+			case ZumeMixinPlugin.LEGACY -> "dev.nolij.zume.legacy.LegacyZume";
+			case ZumeMixinPlugin.PRIMITIVE -> "dev.nolij.zume.primitive.PrimitiveZume";
+			case ZumeMixinPlugin.LEXFORGE -> "dev.nolij.zume.lexforge.LexZume";
+			case ZumeMixinPlugin.LEXFORGE18 -> "dev.nolij.zume.lexforge18.LexZume18";
+			case ZumeMixinPlugin.LEXFORGE16 -> "dev.nolij.zume.lexforge16.LexZume16";
+			case ZumeMixinPlugin.VINTAGE_FORGE -> "dev.nolij.zume.vintage.VintageZume";
 			default -> throw new AssertionError("""
                 Mixins did not load! Zume requires Mixins in order to work properly.
                 Please install one of the following mixin loaders:
                     14.4 - 16.0: MixinBootstrap
                     8.9 - 12.2: MixinBooter >= 5.0
                     7.10 - 12.2: UniMixins >= 0.1.15""");
+		};
+		
+		PackedClassLoader classLoader = new PackedClassLoader(getClass().getClassLoader(), "zume.pack");
+		Thread.currentThread().setContextClassLoader(classLoader);
+		
+		try {
+			Object o = classLoader.loadClass(className).getDeclaredConstructor().newInstance();
+			if(o instanceof ClientModInitializer)
+				((ClientModInitializer) o).onInitializeClient();
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("Failed to load Zume variant: " + className, e);
 		}
 	}
 	
