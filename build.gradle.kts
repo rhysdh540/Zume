@@ -27,7 +27,7 @@ import java.time.ZonedDateTime
 plugins {
     id("java")
 	id("maven-publish")
-	id("com.github.johnrengelman.shadow")
+	id("com.gradleup.shadow")
 	id("me.modmuss50.mod-publish-plugin")
 	id("xyz.wagyourtail.unimined")
 	id("org.ajoberstar.grgit")
@@ -243,7 +243,7 @@ subprojects {
 
 	if (implName in uniminedImpls) {
 		apply(plugin = "xyz.wagyourtail.unimined")
-		apply(plugin = "com.github.johnrengelman.shadow")
+		apply(plugin = "com.gradleup.shadow")
 		
 		unimined.footgunChecks = false
 		

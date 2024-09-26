@@ -385,6 +385,10 @@ open class CompressJarTask : DefaultTask() {
 		if (useProguard)
 			applyProguard(inputJar, minecraftConfigs, project.rootDir)
 		squishJar(inputJar, jsonShrinkingType, mappingsFile)
+		inputJar.copyTo(
+			inputJar.parentFile.resolve(inputJar.nameWithoutExtension + "-no-packing.jar"),
+			overwrite = true)
+		
 		pack(inputJar, mappingsFile, "zume.pack")
 		deflate(outputJar, deflateAlgorithm)
 	}

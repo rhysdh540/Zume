@@ -3,6 +3,8 @@ package dev.rdh.pcl;
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PackedClassLoader extends ClassLoader {
@@ -61,12 +63,35 @@ public class PackedClassLoader extends ClassLoader {
 
 		try (InputStream is = getParent().getResourceAsStream(bundleName)) {
 			byte[] bytes = new byte[length];
-			is.skip(pos);
-			is.read(bytes);
+			
+			long totalSkipped = 0;
+			while (totalSkipped < pos) {
+				long skipped = is.skip(pos - totalSkipped);
+				if (skipped == 0) {
+					throw new RuntimeException(
+						String.format("Entry %s: unable to skip to position %d, only skipped %d bytes!", name, pos, totalSkipped)
+					);
+				}
+				totalSkipped += skipped;
+			}
+			
+			int totalRead = 0;
+			while (totalRead < length) {
+				int bytesRead = is.read(bytes, totalRead, length - totalRead);
+				if (bytesRead == -1) {
+					throw new RuntimeException(
+						String.format("Entry %s: reached end of stream after reading %d bytes, expected %d bytes!", name, totalRead, length)
+					);
+				}
+				totalRead += bytesRead;
+			}
+			
 			System.out.println("Got entry: " + name);
+			System.out.printf("Position: %d; Length: %d\n", pos, length);
+			Path dump = Paths.get("debug").resolve(name);
+			dump.getParent().toFile().mkdirs();
+			java.nio.file.Files.write(dump, bytes);
 			return bytes;
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to load entry: " + name, e);
 		}
 	}
 
@@ -88,12 +113,6 @@ public class PackedClassLoader extends ClassLoader {
 		}
 
 		return new URL(null, "bytes", new ByteArrayURLStreamHandler(bytes));
-	}
-
-	public static void main(String[] args) {
-		PackedClassLoader loader = new PackedClassLoader(PackedClassLoader.class.getClassLoader(), "bundle");
-		loader.loadClass("dev.rdh.pcl.packed.TestMain")
-				.getMethod("main", String[].class).invoke(null, (Object) null);
 	}
 }
 

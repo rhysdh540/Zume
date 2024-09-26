@@ -67,7 +67,14 @@ public class ZumeBootstrapper {
                     7.10 - 12.2: UniMixins >= 0.1.15""");
 		};
 		
-		PackedClassLoader classLoader = new PackedClassLoader(ZumeBootstrapper.class.getClassLoader(), "zume.pack");
+		ClassLoader classLoader = ZumeBootstrapper.class.getClassLoader();
+		if(classLoader.getResource("zume.pack") != null) {
+			System.out.println("Loading packed classloader");
+			classLoader = new PackedClassLoader(ZumeBootstrapper.class.getClassLoader(), "zume.pack");
+			Thread.currentThread().setContextClassLoader(classLoader);
+		} else {
+			System.out.println("Loading normal classloader");
+		}
 		
 		try {
 			Object o = classLoader.loadClass(className).getDeclaredConstructor().newInstance();
