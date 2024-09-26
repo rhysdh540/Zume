@@ -96,7 +96,7 @@ fun squishJar(jar: File, jsonProcessing: JsonShrinkingType, mappingsFile: File?)
 private fun remapMixinConfig(bytes: ByteArray, mappings: MemoryMappingTree): ByteArray {
 	val json = (JsonSlurper().parse(bytes) as Map<String, Any>).toMutableMap()
 	val old = json["plugin"] as String
-	val obf = mappings.obfuscate(old)
+	val obf = mappings.map(old)
 	json["plugin"] = obf
 
 	json["package"] = "zume.mixin"
@@ -113,7 +113,7 @@ private fun processClassFile(bytes: ByteArray, mappings: MemoryMappingTree): Byt
 			for (i in 0 until annotation.values.size step 2) {
 				if (annotation.values[i] == "guiFactory") {
 					val old = annotation.values[i + 1] as String
-					annotation.values[i + 1] = mappings.obfuscate(old)
+					annotation.values[i + 1] = mappings.map(old)
 					println("Remapped guiFactory: $old -> ${annotation.values[i + 1]}")
 				}
 			}
@@ -282,7 +282,7 @@ fun pack(jar: File, mappingsFile: File?, output: String) {
 		"dev.nolij.zume.ZumeMixinPlugin",
 		"dev.nolij.zume.ZumeBootstrapper",
 		"dev.nolij.zume.impl.Zume"
-	).map { mappingsTree?.obfuscate(it) ?: it }
+	).map { mappingsTree?.map(it) ?: it }
 	
 	println("Classes to not pack: $classesToNotPack")
 
@@ -320,7 +320,7 @@ fun pack(jar: File, mappingsFile: File?, output: String) {
 
 			print("skipping $name")
 			if (mappingsTree != null && name.endsWith(".class")) {
-				println(" -> ${mappingsTree.deobfuscate(name.removeSuffix(".class"))}")
+				println(" -> ${mappingsTree.unmap(name.removeSuffix(".class"))}")
 			} else {
 				println()
 			}
@@ -405,7 +405,7 @@ fun mappings(file: File, format: MappingFormat = MappingFormat.PROGUARD): Memory
 }
 
 @Suppress("INACCESSIBLE_TYPE", "NAME_SHADOWING")
-fun MemoryMappingTree.deobfuscate(dst: String): String {
+fun MemoryMappingTree.unmap(dst: String): String {
 	val dst = dst.replace('.', '/')
 	val dstNamespaceIndexes = dstNamespaces.map { getNamespaceId(it) }
 	
@@ -421,7 +421,7 @@ fun MemoryMappingTree.deobfuscate(dst: String): String {
 }
 
 @Suppress("INACCESSIBLE_TYPE", "NAME_SHADOWING")
-fun MemoryMappingTree.obfuscate(src: String): String {
+fun MemoryMappingTree.map(src: String): String {
 	val src = src.replace('.', '/')
 	val dstNamespaceIndex = getNamespaceId(dstNamespaces[0])
 	val classMapping: ClassMapping? = getClass(src)
