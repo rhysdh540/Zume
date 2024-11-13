@@ -23,6 +23,7 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.tree.ClassNode
 import ru.vyarus.gradle.plugin.python.PythonExtension
 import xyz.wagyourtail.unimined.api.minecraft.task.RemapJarTask
+import xyz.wagyourtail.unimined.api.minecraft.task.RemapSourcesJarTask
 import xyz.wagyourtail.unimined.api.unimined
 import java.nio.file.Files
 import java.time.ZonedDateTime
@@ -307,6 +308,14 @@ subprojects {
 				enableMixinExtra()
 				disableRefmap()
 			}
+		}
+		
+		tasks.withType<RemapSourcesJarTask> {
+			enabled = false
+		}
+		
+		tasks.jar {
+			duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 		}
 	}
 	
