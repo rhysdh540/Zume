@@ -468,8 +468,7 @@ val proguardJar by tasks.registering(ProguardTask::class) {
 	
 	config(file("proguard.pro"))
 	
-	mappingsFile = destinationDirectory.get().asFile
-		.resolve("${archiveFile.get().asFile.nameWithoutExtension}-mappings.txt")
+	mappingsFile = layout.buildDirectory.dir("libs").get().file("zume-${Zume.version}-mappings.txt")
 
 	jmod("java.base")
 	jmod("java.desktop")
@@ -595,9 +594,10 @@ val smokeTest by tasks.registering(SmokeTestTask::class) {
 		Config("legacyfabric", "1.7.10", dependencies = setOf(
 			"maven.modrinth:legacy-fabric-api:1.10.2",
 		)),
-//		Config("legacyfabric", "1.6.4", dependencies = setOf(
-//			"maven.modrinth:legacy-fabric-api:1.10.2",
-//		)),
+		Config("legacyfabric", "1.6.4", dependencies = setOf(
+			"maven.modrinth:legacy-fabric-api:1.10.2",
+			"org.apache.logging.log4j:log4j-core:${"log4j_version"()}",
+		), extraArgs = listOf("--jvm-args=-cp ./mods/log4j-core-${"log4j_version"()}.jar")),
 		Config("babric", "b1.7.3", jvmVersion = 17, dependencies = setOf(
 			"maven.modrinth:stationapi:2.0-alpha.2.4",
 		), extraArgs = listOf("--exclude-lib=asm-all")),
