@@ -36,7 +36,7 @@ abstract class AdvzipTask : ProcessJarTask() {
 			val process = ProcessBuilder("advzip", "-z", "-${type.id}", jar.absolutePath).start()
 			val exitCode = process.waitFor()
 			if (exitCode != 0) {
-				error("Failed to compress $jar with $type")
+				error("advzip exited with code $exitCode")
 			}
 		} catch (e: Exception) {
 			error("Failed to compress $jar with $type: ${e.message}")
