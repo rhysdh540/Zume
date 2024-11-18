@@ -17,6 +17,8 @@ abstract class AdvzipTask : ProcessJarTask() {
 	}
 	
 	override fun process() {
+		val jar = inputJar.get().asFile.copyTo(archiveFile.get().asFile, true)
+		
 		if(try {
 			ProcessBuilder("advzip", "-V").start().waitFor() != 0
 		} catch (e: Exception) { true }) {
@@ -28,7 +30,6 @@ abstract class AdvzipTask : ProcessJarTask() {
 			return
 		}
 		
-		val jar = inputJar.get().asFile.copyTo(archiveFile.get().asFile, true)
 		val type = level.get()
 
 		try {
