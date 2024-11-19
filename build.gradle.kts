@@ -32,9 +32,9 @@ import kotlin.math.max
 plugins {
     id("java")
 	id("maven-publish")
-	id("com.github.johnrengelman.shadow")
-	id("me.modmuss50.mod-publish-plugin")
+	id("com.gradleup.shadow")
 	id("xyz.wagyourtail.unimined")
+	id("me.modmuss50.mod-publish-plugin")
 	id("org.ajoberstar.grgit")
 	id("ru.vyarus.use-python")
 }
@@ -204,20 +204,26 @@ allprojects {
 	tasks.withType<JavaCompile> {
 		if (name !in arrayOf("compileMcLauncherJava", "compilePatchedMcJava")) {
 			options.encoding = "UTF-8"
-			sourceCompatibility = "21"
-			options.release = 8
+			options.release = 21
 			javaCompiler = javaToolchains.compilerFor {
 				languageVersion = JavaLanguageVersion.of(21)
 			}
-			options.compilerArgs.addAll(arrayOf("-Xplugin:Manifold no-bootstrap", "-Xplugin:jabel"))
-			options.forkOptions.jvmArgs?.add("-XX:+EnableDynamicAgentLoading")
+			
+			doFirst {
+				options.compilerArgs.addAll(
+					arrayOf(
+					"-Xplugin:Manifold no-bootstrap", "-Xplugin:jvmdg release=8 ${
+						project.configurations["compileClasspath"].files.joinToString(" ") { "cp=$it" }
+					}"))
+			}
 		}
 	}
 	
 	dependencies {
 		compileOnly("org.jetbrains:annotations:${"jetbrains_annotations_version"()}")
 		
-		annotationProcessor("com.pkware.jabel:jabel-javac-plugin:${"jabel_version"()}")
+		annotationProcessor("dev.rdh:jvmdg-javac:${"jvmdg_javac_version"()}:all")
+		annotationProcessor(files("buildSrc/build/libs/buildSrc.jar"))
 
 		compileOnly("systems.manifold:manifold-rt:${"manifold_version"()}")
 		annotationProcessor("systems.manifold:manifold-exceptions:${"manifold_version"()}")
