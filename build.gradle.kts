@@ -182,6 +182,8 @@ allprojects {
 	apply(plugin = "maven-publish")
 
 	repositories {
+		maven("https://maven.wagyourtail.xyz/snapshots")
+		maven("https://maven.wagyourtail.xyz/releases")
 		maven("https://repo.spongepowered.org/maven")
 		maven("https://jitpack.io/")
 		exclusiveContent { 
@@ -203,12 +205,14 @@ allprojects {
 	tasks.withType<JavaCompile> {
 		if (name !in arrayOf("compileMcLauncherJava", "compilePatchedMcJava")) {
 			options.encoding = "UTF-8"
-			sourceCompatibility = "21"
-			options.release = 8
 			javaCompiler = javaToolchains.compilerFor {
 				languageVersion = JavaLanguageVersion.of(21)
 			}
-			options.compilerArgs.addAll(arrayOf("-Xplugin:Manifold no-bootstrap", "-Xplugin:jabel"))
+			val jvmdgOptions = listOf(
+				"downgrade", 
+				"--classVersion 52", // java 8
+			)
+			options.compilerArgs.addAll(arrayOf("-Xplugin:Manifold no-bootstrap", "-Xplugin:jvmdg ${jvmdgOptions.joinToString(" ")}"))
 			options.forkOptions.jvmArgs?.add("-XX:+EnableDynamicAgentLoading")
 		}
 	}
@@ -216,7 +220,7 @@ allprojects {
 	dependencies {
 		compileOnly("org.jetbrains:annotations:${"jetbrains_annotations_version"()}")
 		
-		annotationProcessor("com.pkware.jabel:jabel-javac-plugin:${"jabel_version"()}")
+		annotationProcessor("xyz.wagyourtail.jvmdowngrader:jvmdowngrader:${"jvmdg_version"()}:all")
 
 		compileOnly("systems.manifold:manifold-rt:${"manifold_version"()}")
 		annotationProcessor("systems.manifold:manifold-exceptions:${"manifold_version"()}")
