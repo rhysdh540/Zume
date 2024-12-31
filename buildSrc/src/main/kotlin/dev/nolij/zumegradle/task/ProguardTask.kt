@@ -3,6 +3,7 @@ package dev.nolij.zumegradle.task
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
 import proguard.Configuration
@@ -17,10 +18,10 @@ abstract class ProguardTask : ProcessJarTask() {
 	
 	@get:InputFiles
 	@get:Classpath
-	abstract val classpath: ListProperty<File>
+	abstract val classpath: SetProperty<File>
 	
 	@get:InputFiles
-	abstract val configs: ListProperty<File>
+	abstract val configs: SetProperty<File>
 	
 	@get:Input
 	abstract val options: ListProperty<String>

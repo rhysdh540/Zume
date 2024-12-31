@@ -176,6 +176,13 @@ val uniminedImpls = arrayOf(
 	*lexForgeImpls,
 	*neoForgeImpls,
 )
+val otherImpls = arrayOfProjects(
+	"cosmic-reach:quilt",
+)
+val allImpls = arrayOf(
+	*uniminedImpls,
+	*otherImpls,
+)
 
 allprojects {	
 	apply(plugin = "java")
@@ -366,7 +373,7 @@ dependencies {
 	
 	implementation(project(":api"))
 	
-	uniminedImpls.forEach { 
+	allImpls.forEach { 
 		implementation(project(":${it}")) { isTransitive = false }
 	}
 }
@@ -395,7 +402,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 		sourceSets, 
 		project(":api").sourceSets, 
 		project(":integration:embeddium").sourceSets,
-		uniminedImpls.flatMap { project(":${it}").sourceSets }
+		allImpls.flatMap { project(":${it}").sourceSets }
 	).flatten().forEach {
 		from(it.allSource) { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
 	}
@@ -423,7 +430,7 @@ tasks.shadowJar {
 	dependsOn(apiJar)
 	from(zipTree(apiJar.get().archiveFile.get())) { duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
 	
-	uniminedImpls.map { project(it).tasks.named<ShadowJar>("outputJar").get() }.forEach { implJarTask ->
+	allImpls.map { project(it).tasks.named<ShadowJar>("outputJar").get() }.forEach { implJarTask ->
 		dependsOn(implJarTask)
 		from(zipTree(implJarTask.archiveFile.get())) {
 			duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -496,6 +503,12 @@ val proguardJar by tasks.registering(ProguardTask::class) {
 				.filter { it.extension == "jar" && !it.name.startsWith("zume") }
 				.plus(minecraftConfig.getMinecraft(prodNamespace, prodNamespace).toFile())
 		}
+	)
+	
+	classpath.addAll(
+		otherImpls.map { implName -> project(":$implName").sourceSets["main"].let { it.compileClasspath + it.runtimeClasspath } }
+			.flatten()
+			.filter { it.extension == "jar" }
 	)
 	
 	archiveClassifier = "proguard"

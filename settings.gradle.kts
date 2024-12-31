@@ -1,7 +1,16 @@
 pluginManagement {
     repositories {
 	    gradlePluginPortal()
+	    maven("https://jitpack.io")
     }
+	
+	resolutionStrategy {
+		eachPlugin {
+			if (requested.id.id == "cosmicloom") {
+				useModule("org.codeberg.CRModders:cosmic-loom:${requested.version}")
+			}
+		}
+	}
 }
 
 plugins {
@@ -22,3 +31,4 @@ include("lexforge")
 include("lexforge18")
 include("lexforge16")
 include(":integration:embeddium")
+include(":cosmic-reach:quilt")
